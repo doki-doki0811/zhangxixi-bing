@@ -912,9 +912,15 @@ function toggle(id) {
 }
 
 function getItemText(item) {
-  return (item.querySelector('.name')?.textContent || '')
-    + (item.querySelector('.meta')?.textContent || '')
-    + (item.querySelector('.item-body-inner')?.textContent || '');
+  // 只匹配食谱名 + 分类标签 + 配料 + 步骤，排除小贴士（tip）
+  // 避免"芒果同理""也可以换XX"这类类比文字干扰搜索结果
+  const name = item.querySelector('.name')?.textContent || '';
+  const meta = item.querySelector('.meta')?.textContent || '';
+  const inner = item.querySelector('.item-body-inner');
+  if (!inner) return name + meta;
+  const clone = inner.cloneNode(true);
+  clone.querySelectorAll('.tip').forEach(t => t.remove());
+  return name + meta + (clone.textContent || '');
 }
 
 function applyFilters() {
